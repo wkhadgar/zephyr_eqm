@@ -1,0 +1,10 @@
+/**
+ * @file thunderboard.overlay
+ * @author Paulo Santos (pauloroberto.santos@edge.ufal.br)
+ * @brief Organiza o DTS da placa de controle e seus periféricos.
+ * @version 0.1
+ * @date 21-08-2023
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
