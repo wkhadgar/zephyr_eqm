@@ -9,17 +9,27 @@
  *
  */
 
+#include <zephyr/drivers/gnss.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/kernel.h>
 
 LOG_MODULE_REGISTER(main);
 
-int main(void) {
-    LOG_INF("Iniciando Zephyr EQM.\n");
+struct gpio_dt_spec builtin_led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 
-    while (1) {
-        k_msleep(1000);
-    }
+static void gnss_data_cb(const struct device *dev, const struct gnss_data *data)
+{
+	if (data->info.fix_status != GNSS_FIX_STATUS_NO_FIX) {
+		gpio_pin_toggle_dt(&builtin_led);
+	}
+}
 
-    return 0;
+GNSS_DATA_CALLBACK_DEFINE(DEVICE_DT_GET(DT_NODELABEL(gnss)), gnss_data_cb);
+
+int main(void)
+{
+	LOG_INF("Iniciando Zephyr EQM.\n");
+	gpio_pin_configure_dt(&builtin_led, GPIO_OUTPUT_INACTIVE);
+
+	return 0;
 }

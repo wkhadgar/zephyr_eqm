@@ -8,3 +8,11 @@
  * @copyright Copyright (c) 2023
  *
  */
+
+&usart1 {
+    current-speed = <9600>;
+
+    gnss: gnss-nmea-generic {
+        compatible = "gnss-nmea-generic";
+    };
+};
