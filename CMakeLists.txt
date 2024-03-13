@@ -10,4 +10,5 @@ include_directories(BEFORE src/)
 
 target_sources(app PRIVATE
         src/main.c
+        src/driver/stepper.c
 )
