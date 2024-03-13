@@ -8,44 +8,85 @@
  * @copyright Copyright (c) 2024
  *
  */
+
 #include "stepper.h"
 
-int stepper_init(struct stepper_motor *stepper_motor)
+#include <zephyr/drivers/gpio.h>
+
+/**
+ * @brief Defines the mount axises as stepper motors.
+ */
+static struct stepper_motor axises[STEPPER_AXIS_COUNT] = {
+	[STEPPER_AXIS_RA] =
+		{
+			.control =
+				{
+					.direction = GPIO_DT_SPEC_GET(
+						DT_NODELABEL(stepper_ra_direction), gpios),
+					.enable = GPIO_DT_SPEC_GET(DT_NODELABEL(stepper_ra_enable),
+								   gpios),
+					.step = PWM_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0),
+				},
+			.position =
+				{
+					.current = MAX_STEPS / 2,
+					.target = MAX_STEPS / 2,
+				},
+			.is_on = false,
+		},
+	[STEPPER_AXIS_DEC] =
+		{
+			.control =
+				{
+					.direction = GPIO_DT_SPEC_GET(
+						DT_NODELABEL(stepper_dec_direction), gpios),
+					.enable = GPIO_DT_SPEC_GET(DT_NODELABEL(stepper_dec_enable),
+								   gpios),
+					.step = PWM_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 1),
+				},
+			.position =
+				{
+					.current = MAX_STEPS / 2,
+					.target = MAX_STEPS / 2,
+				},
+			.is_on = false,
+		},
+};
+
+int axis_init(enum stepper_axis axis)
 {
-	if (gpio_pin_configure_dt(&stepper_motor->control.enable, GPIO_OUTPUT_INACTIVE) ||
-	    gpio_pin_configure_dt(&stepper_motor->control.direction, GPIO_OUTPUT_INACTIVE)) {
+	if (gpio_pin_configure_dt(&axises[axis].control.enable, GPIO_OUTPUT_INACTIVE) ||
+	    gpio_pin_configure_dt(&axises[axis].control.direction, GPIO_OUTPUT_INACTIVE)) {
 		return -ENODEV;
+	}
+
+	if (!pwm_is_ready_dt(&axises[axis].control.step)) {
+		return -EIO;
 	}
 
 	return 0;
 }
-
-void stepper_enable(struct stepper_motor *stepper_motor)
+void axis_enable(enum stepper_axis axis)
 {
-	gpio_pin_set_dt(&stepper_motor->control.enable, true);
+	gpio_pin_set_dt(&axises[axis].control.enable, true);
+	axises[axis].is_on = true;
+}
+void axis_disable(enum stepper_axis axis)
+{
+	gpio_pin_set_dt(&axises[axis].control.enable, false);
+	axises[axis].is_on = false;
+}
+void axis_set_direction(enum stepper_axis axis, enum stepper_direction dir)
+{
+	gpio_pin_set_dt(&axises[axis].control.direction, dir);
 }
 
-void stepper_disable(struct stepper_motor *stepper_motor)
+int axis_set_speed(enum stepper_axis axis, uint32_t period_us)
 {
-	gpio_pin_set_dt(&stepper_motor->control.enable, false);
-}
-
-void stepper_set_direction(struct stepper_motor *stepper_motor, enum stepper_direction dir)
-{
-	gpio_pin_set_dt(&stepper_motor->control.direction, dir);
-}
-
-int stepper_set_speed(struct stepper_motor *stepper_motor, uint16_t steps_per_second)
-{
-	uint32_t micro_seconds_period;
-
-	if (steps_per_second == 0) {
+	if (period_us < CONFIG_MIN_PERIOD_US) {
 		return -EDOM;
 	}
 
-	micro_seconds_period = 1000000 / steps_per_second;
-	pwm_set_dt(&stepper_motor->control.step, micro_seconds_period, micro_seconds_period >> 1);
-	stepper_motor->steps_per_second = steps_per_second;
-
+	pwm_set_dt(&axises[axis].control.step, PWM_USEC(period_us), PWM_USEC(period_us) >> 1);
 	return 0;
 }

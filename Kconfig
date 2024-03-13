@@ -1,3 +1,57 @@
+menu "EQM Configurations"
 
+    menu "Stepper motors"
+        config MOTOR_RAW_STEPS
+            int "Stepper motor resolution in steps."
+            default 200
+            help
+                This is the raw stepper motor resolution and should match the specific stepper motor hardware resolution.
+                Do not take in consideration the micro-stepping that some drivers can deliver.
+
+        choice
+        help
+            Some drivers can deliver micro-stepping for the stepper motor (such as A4988) and if enabled, should be
+            specified in this field.
+        prompt"Driver Micro-stepping"
+        default MICRO_STEPPING_16_STEPS
+
+            config MICRO_STEPPING_FULL_STEP
+            bool "No micro-stepping (1/1)"
+
+            config MICRO_STEPPING_HALF_STEP
+            bool "1/2 steps"
+
+            config MICRO_STEPPING_QUARTER_STEP
+            bool "1/4 steps"
+
+            config MICRO_STEPPING_8_STEPS
+            bool "1/8 steps"
+
+            config MICRO_STEPPING_16_STEPS
+            bool "1/16 steps"
+        endchoice
+
+        config MIN_PERIOD_US
+            int "Minimum secure period (max speed) for the stepper motors, in us."
+            default 1870
+    endmenu
+
+    menu "Gear Ratios"
+        config MOUNT_RA_GEAR_RATIO
+            int "Gear ratio for the RA axis of the mount."
+            default 96
+            help
+                This is the gear ratio of the equatorial mount right ascension axis, relative to the telescope from
+                the stepper motor.
+
+        config MOUNT_DEC_GEAR_RATIO
+            int "Gear ratio for the DEC axis of the mount."
+            default 96
+            help
+                This is the gear ratio of the equatorial mount declination axis, relative to the telescope from
+                the stepper motor.
+    endmenu
+
+endmenu
 
 source "Kconfig.zephyr"
