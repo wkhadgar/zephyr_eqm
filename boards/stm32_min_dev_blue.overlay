@@ -10,86 +10,87 @@
  */
 
 / {
-    zephyr,user {
-        pwms = <&stepper_ra_step 1 PWM_USEC(281250) PWM_POLARITY_NORMAL>,
-               <&stepper_dec_step 4 PWM_USEC(281250) PWM_POLARITY_NORMAL>,
-               <&led_pwm 3 PWM_MSEC(1000) PWM_POLARITY_NORMAL>;
-    };
+	zephyr,user {
+		pwm-names = "step_ra", "step_dec", "indicator_led";
+		pwms = <&stepper_ra_step 1 PWM_USEC(281250) PWM_POLARITY_NORMAL>,
+			   <&stepper_dec_step 4 PWM_USEC(281250) PWM_POLARITY_NORMAL>,
+			   <&led_pwm 3 PWM_MSEC(1000) PWM_POLARITY_NORMAL>;
+	};
 };
 
 &usart1 {
-    current-speed = <9600>;
+	current-speed = <9600>;
 
-    gnss: gnss-nmea-generic {
-        compatible = "gnss-nmea-generic";
-    };
+	gnss: gnss-nmea-generic {
+		compatible = "gnss-nmea-generic";
+	};
 };
 
 &gpioa {
-    steppers {
-        compatible = "gpio-leds";
+	steppers {
+		compatible = "gpio-leds";
 
-        stepper_ra_enable: M1_EN {
-            gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
-        };
-    };
+		stepper_ra_enable: M1_EN {
+			gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
+		};
+	};
 };
 
 &gpiob {
-    steppers {
-        compatible = "gpio-leds";
+	steppers {
+		compatible = "gpio-leds";
 
-        stepper_ra_direction: M1_DIR {
-            gpios = <&gpiob 0 GPIO_ACTIVE_HIGH>;
-        };
+		stepper_ra_direction: M1_DIR {
+			gpios = <&gpiob 0 GPIO_ACTIVE_HIGH>;
+		};
 
-        stepper_dec_enable: M2_EN {
-            gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;
-        };
+		stepper_dec_enable: M2_EN {
+			gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;
+		};
 
-        stepper_dec_direction: M2_DIR {
-            gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>;
-        };
-    };
+		stepper_dec_direction: M2_DIR {
+			gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>;
+		};
+	};
 
-    led {
-        compatible = "gpio-leds";
+	led {
+		compatible = "gpio-leds";
 
-        led_gnd: LED_GND {
-            gpios = <&gpiob 13 GPIO_OPEN_DRAIN>;
-        };
-    };
+		led_gnd: LED_GND {
+			gpios = <&gpiob 13 GPIO_OPEN_DRAIN>;
+		};
+	};
 };
 
 &timers2 {
-    st,prescaler = <359>;
-    status = "okay";
+	st,prescaler = <359>;
+	status = "okay";
 
-    stepper_dec_step: pwm {
-        status = "okay";
-        pinctrl-0 = <&tim2_ch4_remap3_pwm_out_pb11>;
-        pinctrl-names = "default";
-    };
+	stepper_dec_step: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim2_ch4_remap3_pwm_out_pb11>;
+		pinctrl-names = "default";
+	};
 };
 
 &timers3 {
-    st,prescaler = <359>;
-    status = "okay";
+	st,prescaler = <359>;
+	status = "okay";
 
-    stepper_ra_step: pwm {
-        status = "okay";
-        pinctrl-0 = <&tim3_ch1_pwm_out_pa6>;
-        pinctrl-names = "default";
-    };
+	stepper_ra_step: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim3_ch1_pwm_out_pa6>;
+		pinctrl-names = "default";
+	};
 };
 
 &timers4 {
-    st,prescaler = <35999>;
-    status = "okay";
+	st,prescaler = <35999>;
+	status = "okay";
 
-    led_pwm: pwm {
-        status = "okay";
-        pinctrl-0 = <&tim4_ch3_pwm_out_pb8>;
-        pinctrl-names = "default";
-    };
+	led_pwm: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim4_ch3_pwm_out_pb8>;
+		pinctrl-names = "default";
+	};
 };

@@ -1,6 +1,6 @@
 /**
  * @file stepper.c
- * @author Paulo Santos (pauloroberto.santos@edge.ufal.br)
+ * @author Paulo Santos (pauloxrms@gmail.com)
  * @brief Stepper motor driver for a A988 driven stepper motor.
  * @version 0.1
  * @date 12-03-2024
@@ -13,6 +13,10 @@
 
 #include <zephyr/drivers/gpio.h>
 
+#define GPIO_BY_LABEL(label) GPIO_DT_SPEC_GET(DT_NODELABEL(label), gpios)
+
+#define PWM_BY_NAME(label) PWM_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), label)
+
 /**
  * @brief Defines the mount axises as stepper motors.
  */
@@ -21,11 +25,9 @@ static struct stepper_motor axises[STEPPER_AXIS_COUNT] = {
 		{
 			.control =
 				{
-					.direction = GPIO_DT_SPEC_GET(
-						DT_NODELABEL(stepper_ra_direction), gpios),
-					.enable = GPIO_DT_SPEC_GET(DT_NODELABEL(stepper_ra_enable),
-								   gpios),
-					.step = PWM_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0),
+					.direction = GPIO_BY_LABEL(stepper_ra_direction),
+					.enable = GPIO_BY_LABEL(stepper_ra_enable),
+					.step = PWM_BY_NAME(step_ra),
 				},
 			.position =
 				{
@@ -38,11 +40,9 @@ static struct stepper_motor axises[STEPPER_AXIS_COUNT] = {
 		{
 			.control =
 				{
-					.direction = GPIO_DT_SPEC_GET(
-						DT_NODELABEL(stepper_dec_direction), gpios),
-					.enable = GPIO_DT_SPEC_GET(DT_NODELABEL(stepper_dec_enable),
-								   gpios),
-					.step = PWM_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 1),
+					.direction = GPIO_BY_LABEL(stepper_dec_direction),
+					.enable = GPIO_BY_LABEL(stepper_dec_enable),
+					.step = PWM_BY_NAME(step_dec),
 				},
 			.position =
 				{
@@ -84,7 +84,7 @@ void axis_set_direction(enum stepper_axis axis, enum stepper_direction dir)
 int axis_set_speed(enum stepper_axis axis, uint32_t period_us)
 {
 	if (period_us < CONFIG_MIN_PERIOD_US) {
-		return -EDOM;
+		return -ENOTSUP;
 	}
 
 	pwm_set_dt(&axises[axis].control.step, PWM_USEC(period_us), PWM_USEC(period_us) >> 1);

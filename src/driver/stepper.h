@@ -1,7 +1,7 @@
 /**
  * @file stepper.h
- * @author Paulo Santos (pauloroberto.santos@edge.ufal.br)
- * @brief Stepper motor driver for a A988 driven stepper motor.
+ * @author Paulo Santos (pauloxrms@gmail.com)
+ * @brief Interface to the GNSS data wrapper.
  * @version 0.1
  * @date 12-03-2024
  *
@@ -15,15 +15,15 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pwm.h>
 
-#if defined(CONFIG_MICRO_STEPPING_16_STEPS)
+#if CONFIG_MICRO_STEPPING_16_STEPS
 #define MICRO_STEPPING 16
-#elif defined(CONFIG_MICRO_STEPPING_8_STEPS)
+#elif CONFIG_MICRO_STEPPING_8_STEPS
 #define MICRO_STEPPING 8
-#elif defined(CONFIG_MICRO_STEPPING_QUARTER_STEP)
+#elif CONFIG_MICRO_STEPPING_QUARTER_STEP
 #define MICRO_STEPPING 4
-#elif defined(CONFIG_MICRO_STEPPING_HALF_STEP)
+#elif CONFIG_MICRO_STEPPING_HALF_STEP
 #define MICRO_STEPPING 2
-#elif defined(CONFIG_MICRO_STEPPING_FULL_STEP)
+#elif CONFIG_MICRO_STEPPING_FULL_STEP
 #define MICRO_STEPPING 1
 #endif
 
@@ -77,7 +77,9 @@ struct stepper_motor {
  * @brief Initializes a stepper motor.
  *
  * @param axis Axis to be initialized.
- * @return 0 if successful, an -errno int otherwise.
+ * @retval 0 if successful.
+ * @retval -ENODEV if driver GPIOs can't be initialized.
+ * @retval -EIO if driver PWM is not ready.
  */
 int axis_init(enum stepper_axis axis);
 /**
@@ -107,7 +109,8 @@ void axis_set_direction(enum stepper_axis axis, enum stepper_direction dir);
  *
  * @param axis Axis to update.
  * @param period_us Period for each step, in microseconds.
- * @return 0 if successful, an -errno int otherwise.
+ * @retval 0 if successful.
+ * @retval -ENOTSUP if @p period_us is too small.
  */
 int axis_set_speed(enum stepper_axis axis, uint32_t period_us);
 
