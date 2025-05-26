@@ -11,8 +11,10 @@ include_directories(BEFORE src/)
 
 target_sources(app PRIVATE
         src/main.c
+
         src/app/target_controller.c
+
+        src/driver/gnss.c
         src/driver/stepper.c
-        src/infra/gnss.c
-        src/infra/lst.c
+        src/driver/usb.c
 )
