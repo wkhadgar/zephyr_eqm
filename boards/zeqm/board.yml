@@ -1,0 +1,11 @@
+board:
+  name: zeqm
+  full_name: Zephyr Equatorial Mount Board
+  vendor: wkhadgar
+  revision:
+    format: custom
+    default: "dev"
+    revisions:
+      - name: "dev"
+  socs:
+    - name: stm32f103xb

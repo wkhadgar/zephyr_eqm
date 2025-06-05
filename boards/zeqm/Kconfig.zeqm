@@ -1,0 +1,7 @@
+# Zephyr EQM Board Configuration File
+
+# Copyright (c) 2025, Paulo Santos (wkhadgar@github)
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_ZEQM
+	select SOC_STM32F103X8

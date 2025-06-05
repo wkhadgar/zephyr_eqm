@@ -19,7 +19,7 @@
 /**
  * @brief Board LED GPIO.
  */
-struct gpio_dt_spec builtin_led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
+struct gpio_dt_spec builtin_led = GPIO_DT_SPEC_GET(DT_NODELABEL(led), gpios);
 
 /**
  * @brief Target controller data.
